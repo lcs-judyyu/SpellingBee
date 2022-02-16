@@ -8,6 +8,24 @@
 import AVFoundation
 import SwiftUI
 
+//button style
+struct GrowingButton: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .padding(.vertical, 10)
+            .padding(.horizontal, 15)
+            .background(configuration.isPressed ? Color.purple.opacity(0.5) : Color.purple.opacity(0.07))
+            .foregroundColor(.black)
+            .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 5)
+                    .stroke(Color.purple, lineWidth: 2)
+            )
+            .scaleEffect(configuration.isPressed ? 1.06 : 1)
+            .animation(.easeOut(duration: 0.3), value: configuration.isPressed)
+    }
+}
+
 struct ContentView: View {
     
     // MARK: Stored properties
@@ -47,7 +65,7 @@ struct ContentView: View {
             TextField("Enter your answer here",
                       text: $inputGiven)
                 .multilineTextAlignment(.center)
-                .font(.title2)
+                .font(.title)
             
             ZStack {
                 Button(action: {
@@ -62,11 +80,11 @@ struct ContentView: View {
                         answerCorrect = false
                     }
                 }, label: {
-                    Text("Check Your Answer")
-                        .font(.largeTitle)
+                    Text("Check Answer")
+                        .font(.title)
                 })
                     .padding()
-                    .buttonStyle(.bordered)
+                    .buttonStyle(GrowingButton())
                 // Only show this button when an answer has not been checked
                     .opacity(answerChecked == false ? 1.0 : 0.0)
                 
@@ -80,11 +98,11 @@ struct ContentView: View {
                     // Reset the input field
                     inputGiven = ""
                 }, label: {
-                    Text("New question")
-                        .font(.largeTitle)
+                    Text("New Question")
+                        .font(.title)
                 })
                     .padding()
-                    .buttonStyle(.bordered)
+                    .buttonStyle(GrowingButton())
                 // Only show this button when an answer has been checked
                     .opacity(answerChecked == true ? 1.0 : 0.0)
             }
