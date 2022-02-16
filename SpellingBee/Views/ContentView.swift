@@ -14,12 +14,12 @@ struct GrowingButton: ButtonStyle {
         configuration.label
             .padding(.vertical, 10)
             .padding(.horizontal, 15)
-            .background(configuration.isPressed ? Color.purple.opacity(0.5) : Color.purple.opacity(0.07))
+            .background(configuration.isPressed ? Color.orange.opacity(0.5) : Color.orange.opacity(0.15))
             .foregroundColor(.black)
             .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: 5)
-                    .stroke(Color.purple, lineWidth: 2)
+                    .stroke(Color.orange, lineWidth: 2)
             )
             .scaleEffect(configuration.isPressed ? 1.06 : 1)
             .animation(.easeOut(duration: 0.3), value: configuration.isPressed)
@@ -43,6 +43,7 @@ struct ContentView: View {
             Image(currentItem.imageName)
                 .resizable()
                 .scaledToFit()
+                .hoverEffect(.lift)
                 .onTapGesture {
                     
                     // Create the word to be spoken (an utterance) and set
@@ -62,6 +63,7 @@ struct ContentView: View {
                     synthesizer.speak(utterance)
                     
                 }
+            
             TextField("Enter your answer here",
                       text: $inputGiven)
                 .multilineTextAlignment(.center)
@@ -105,6 +107,16 @@ struct ContentView: View {
                     .buttonStyle(GrowingButton())
                 // Only show this button when an answer has been checked
                     .opacity(answerChecked == true ? 1.0 : 0.0)
+            }
+            
+            ZStack {
+                LottieView(animationNamed: "37200-good-coche")
+                    .opacity(answerCorrect == true ? 1.0 : 0.0)
+                    .padding()
+                
+                LottieView(animationNamed: "82082-wrong-feedback")
+                    .opacity(answerChecked == true && answerCorrect == false ? 1.0 : 0.0)
+                    .padding()
             }
         }
     }
