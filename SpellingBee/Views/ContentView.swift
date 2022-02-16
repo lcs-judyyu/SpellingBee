@@ -12,6 +12,10 @@ struct ContentView: View {
     
     // MARK: Stored properties
     @State var currentItem = itemsToSpell.randomElement()!
+    @State var inputGiven = ""
+    
+    @State var answerChecked = false
+    @State var answerCorrect = false
     
     // MARK: Computed properties
     var body: some View {
@@ -40,9 +44,51 @@ struct ContentView: View {
                     synthesizer.speak(utterance)
                     
                 }
+            TextField("Enter your answer here",
+                      text: $inputGiven)
+                .multilineTextAlignment(.center)
+                .font(.title2)
             
+            ZStack {
+                Button(action: {
+                    
+                    // Answer has been checked
+                    answerChecked = true
+                    
+                    // Check the answer!
+                    if inputGiven.lowercased() == currentItem.word {
+                        answerCorrect = true
+                    } else {
+                        answerCorrect = false
+                    }
+                }, label: {
+                    Text("Check Your Answer")
+                        .font(.largeTitle)
+                })
+                    .padding()
+                    .buttonStyle(.bordered)
+                // Only show this button when an answer has not been checked
+                    .opacity(answerChecked == false ? 1.0 : 0.0)
+                
+                Button(action: {
+                    // Generate a new question
+                    currentItem = itemsToSpell.randomElement()!
+                    
+                    answerChecked = false
+                    answerCorrect = false
+                    
+                    // Reset the input field
+                    inputGiven = ""
+                }, label: {
+                    Text("New question")
+                        .font(.largeTitle)
+                })
+                    .padding()
+                    .buttonStyle(.bordered)
+                // Only show this button when an answer has been checked
+                    .opacity(answerChecked == true ? 1.0 : 0.0)
+            }
         }
-        
     }
 }
 
