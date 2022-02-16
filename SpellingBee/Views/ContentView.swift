@@ -109,14 +109,21 @@ struct ContentView: View {
                     .opacity(answerChecked == true ? 1.0 : 0.0)
             }
             
+            Text("Answer: " + "\(currentItem.word)")
+                .font(.title)
+                .bold()
+                .opacity(answerChecked == true && answerCorrect == false ? 1.0 : 0.0)
+            
             ZStack {
                 LottieView(animationNamed: "37200-good-coche")
                     .opacity(answerCorrect == true ? 1.0 : 0.0)
-                    .padding()
+                    .scaleEffect(0.7)
+                    .padding(.horizontal)
                 
                 LottieView(animationNamed: "82082-wrong-feedback")
                     .opacity(answerChecked == true && answerCorrect == false ? 1.0 : 0.0)
-                    .padding()
+                    .scaleEffect(0.7)
+                    .padding(.horizontal)
             }
         }
     }
