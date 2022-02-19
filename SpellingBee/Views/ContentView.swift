@@ -14,7 +14,7 @@ struct GrowingButton: ButtonStyle {
         configuration.label
             .padding(.vertical, 10)
             .padding(.horizontal, 15)
-            .background(configuration.isPressed ? Color.orange.opacity(0.5) : Color.orange.opacity(0.15))
+            .background(configuration.isPressed ? Color.orange.opacity(0.5) : Color.orange.opacity(0.2))
             .foregroundColor(.black)
             .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
             .overlay(
@@ -37,103 +37,108 @@ struct ContentView: View {
     
     // MARK: Computed properties
     var body: some View {
-        
-        VStack {
+        ZStack {
             
-            ZStack {
-                Image(currentItem.imageName)
-                    .resizable()
-                    .scaledToFit()
-                    .hoverEffect(.lift)
-                    .onTapGesture {
-                        
-                        // Create the word to be spoken (an utterance) and set
-                        // characteristics of how the voice will sound
-                        let utterance = AVSpeechUtterance(string: currentItem.word)
-                        
-                        // See a list of available language codes and their corresponding
-                        // voice names and genders here:
-                        // https://www.ikiapps.com/tips/2015/12/30/setting-voice-for-tts-in-ios
-                        utterance.voice = AVSpeechSynthesisVoice(language: "en-GB")
-                        
-                        // How fast the utterance will be spoken
-                        utterance.rate = 0.5
-                        
-                        // Synthesize (speak) the utterance
-                        let synthesizer = AVSpeechSynthesizer()
-                        synthesizer.speak(utterance)
-                        
-                    }
+            Color.yellow.opacity(0.2)
+                .edgesIgnoringSafeArea(.all)
+            
+            VStack {
                 
-                Text("Tap me")
-                    .font(.title2)
-                    .italic()
-                    .padding(.vertical, 10)
-                    .padding(.horizontal, 15)
-                    .background(Color.white.opacity(0.6))
-                    .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
-            }
-            
-            TextField("Enter your answer here",
-                      text: $inputGiven)
-                .multilineTextAlignment(.center)
-                .font(.title)
-            
-            ZStack {
-                Button(action: {
+                ZStack {
+                    Image(currentItem.imageName)
+                        .resizable()
+                        .scaledToFit()
+                        .hoverEffect(.lift)
+                        .onTapGesture {
+                            
+                            // Create the word to be spoken (an utterance) and set
+                            // characteristics of how the voice will sound
+                            let utterance = AVSpeechUtterance(string: currentItem.word)
+                            
+                            // See a list of available language codes and their corresponding
+                            // voice names and genders here:
+                            // https://www.ikiapps.com/tips/2015/12/30/setting-voice-for-tts-in-ios
+                            utterance.voice = AVSpeechSynthesisVoice(language: "en-GB")
+                            
+                            // How fast the utterance will be spoken
+                            utterance.rate = 0.5
+                            
+                            // Synthesize (speak) the utterance
+                            let synthesizer = AVSpeechSynthesizer()
+                            synthesizer.speak(utterance)
+                            
+                        }
                     
-                    // Answer has been checked
-                    answerChecked = true
+                    Text("Tap me")
+                        .font(.title2)
+                        .italic()
+                        .padding(.vertical, 10)
+                        .padding(.horizontal, 15)
+                        .background(Color.white.opacity(0.6))
+                        .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+                }
+                
+                TextField("Enter your answer here",
+                          text: $inputGiven)
+                    .multilineTextAlignment(.center)
+                    .font(.title)
+                
+                ZStack {
+                    Button(action: {
+                        
+                        // Answer has been checked
+                        answerChecked = true
+                        
+                        // Check the answer!
+                        if inputGiven.lowercased() == currentItem.word {
+                            answerCorrect = true
+                        } else {
+                            answerCorrect = false
+                        }
+                    }, label: {
+                        Text("Check Answer")
+                            .font(.title)
+                    })
+                        .padding()
+                        .buttonStyle(GrowingButton())
+                    // Only show this button when an answer has not been checked
+                        .opacity(answerChecked == false ? 1.0 : 0.0)
                     
-                    // Check the answer!
-                    if inputGiven.lowercased() == currentItem.word {
-                        answerCorrect = true
-                    } else {
+                    Button(action: {
+                        // Generate a new question
+                        currentItem = itemsToSpell.randomElement()!
+                        
+                        answerChecked = false
                         answerCorrect = false
-                    }
-                }, label: {
-                    Text("Check Answer")
-                        .font(.title)
-                })
-                    .padding()
-                    .buttonStyle(GrowingButton())
-                // Only show this button when an answer has not been checked
-                    .opacity(answerChecked == false ? 1.0 : 0.0)
+                        
+                        // Reset the input field
+                        inputGiven = ""
+                    }, label: {
+                        Text("New Question")
+                            .font(.title)
+                    })
+                        .padding()
+                        .buttonStyle(GrowingButton())
+                    // Only show this button when an answer has been checked
+                        .opacity(answerChecked == true ? 1.0 : 0.0)
+                }
                 
-                Button(action: {
-                    // Generate a new question
-                    currentItem = itemsToSpell.randomElement()!
-                    
-                    answerChecked = false
-                    answerCorrect = false
-                    
-                    // Reset the input field
-                    inputGiven = ""
-                }, label: {
-                    Text("New Question")
-                        .font(.title)
-                })
-                    .padding()
-                    .buttonStyle(GrowingButton())
-                // Only show this button when an answer has been checked
-                    .opacity(answerChecked == true ? 1.0 : 0.0)
-            }
-            
-            Text("Answer: " + "\(currentItem.word)")
-                .font(.title)
-                .bold()
-                .opacity(answerChecked == true && answerCorrect == false ? 1.0 : 0.0)
-            
-            ZStack {
-                LottieView(animationNamed: "37200-good-coche")
-                    .opacity(answerCorrect == true ? 1.0 : 0.0)
-                    .scaleEffect(0.7)
-                    .padding(.horizontal)
-                
-                LottieView(animationNamed: "82082-wrong-feedback")
+                Text("Answer: " + "\(currentItem.word)")
+                    .font(.title)
+                    .bold()
                     .opacity(answerChecked == true && answerCorrect == false ? 1.0 : 0.0)
-                    .scaleEffect(0.7)
-                    .padding(.horizontal)
+                
+                ZStack {
+                    LottieView(animationNamed: "37200-good-coche")
+                        .opacity(answerCorrect == true ? 1.0 : 0.0)
+                        .scaleEffect(0.7)
+                        .padding(.horizontal)
+                    
+                    LottieView(animationNamed: "82082-wrong-feedback")
+                        .opacity(answerChecked == true && answerCorrect == false ? 1.0 : 0.0)
+                        .scaleEffect(0.7)
+                        .padding(.horizontal)
+                }
             }
         }
     }
